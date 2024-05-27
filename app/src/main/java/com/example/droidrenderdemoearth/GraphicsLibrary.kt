@@ -45,8 +45,6 @@ class GraphicsLibrary(activity: GraphicsActivity?,
         textureSetClamp()
     }
 
-
-
     fun bufferArrayGenerate(length: Int): Int {
         if (length > 0) {
             val bufferHandle = IntArray(1)
@@ -262,9 +260,11 @@ class GraphicsLibrary(activity: GraphicsActivity?,
         )
     }
 
-    fun textureBind(texture: Int) {
-        if (texture != -1) {
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture)
+    fun textureBind(texture: GraphicsTexture?) {
+        texture?.let { _texture ->
+            if (_texture.textureIndex != -1) {
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _texture.textureIndex)
+            }
         }
     }
 
@@ -493,6 +493,23 @@ class GraphicsLibrary(activity: GraphicsActivity?,
             }
         }
     }
+
+
+    // @Precondition: linkBufferToShaderProgram has been called with program.
+    // @Precondition: the texture is expected to be used on GL_TEXTURE0...
+    fun uniformsTextureSet(program: ShaderProgram?, texture: GraphicsTexture?) {
+        program?.let { _program ->
+            if (_program.uniformLocationTexture != -1) {
+                texture?.let { _texture ->
+                    GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+                    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _texture.textureIndex)
+                    GLES20.glUniform1i(_program.uniformLocationTexture, 0)
+                }
+            }
+        }
+    }
+
+    //graphics?.linkBufferToShaderProgram(graphicsPipeline?.programSprite2D, gabbo)
 
     /*
 

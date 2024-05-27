@@ -12,30 +12,18 @@ val zippoVertz = arrayOf(
     VertexSprite2D(512.0f, -512.0f, 1.0f, 0.0f),
     VertexSprite2D(-512.0f, 512.0f, 0.0f, 1.0f),
     VertexSprite2D(512.0f, 512.0f, 1.0f, 1.0f)
-
 )
 
-/*
-val zippoVertz = arrayOf(
-    VertexSprite2D(-0.5f + 0.2f, -0.5f - 0.3f, 0.0f, 0.0f),
-    VertexSprite2D(0.5f + 0.2f, -0.5f - 0.3f, 1.0f, 0.0f),
-    VertexSprite2D(-0.5f + 0.2f, 0.5f - 0.3f, 0.0f, 1.0f),
-    VertexSprite2D(0.5f + 0.2f, -0.5f - 0.3f, 1.0f, 0.0f),
-    VertexSprite2D(-0.5f + 0.2f, 0.5f - 0.3f, 0.0f, 1.0f),
-    VertexSprite2D(0.5f + 0.2f, 0.5f - 0.3f, 1.0f, 1.0f)
-)
- */
-
-class Zippo(graphicsPipeline: GraphicsPipeline,
-            bitmap: Bitmap?,
-                graphics: GraphicsLibrary?) {
+class Zippo(graphicsPipeline: GraphicsPipeline?,
+            texture: GraphicsTexture?,
+            graphics: GraphicsLibrary?) {
 
     val indices = intArrayOf(0, 1, 2, 3)
     val indexBuffer: IntBuffer
 
 
 
-    var color = Color(1.0f, 0.5f, 0.75f, 0.5f)
+    var color = Color(1.0f, 1.0f, 1.0f, 1.0f)
     var colorBuffer: FloatBuffer
 
     var projectionMatrix = Matrix()
@@ -46,21 +34,9 @@ class Zippo(graphicsPipeline: GraphicsPipeline,
     var modelViewMatrixBuffer: FloatBuffer
 
 
-    private val bitmapRef: WeakReference<Bitmap> = WeakReference(bitmap)
-    val bitmap: Bitmap?
-        get() = bitmapRef.get()
-
-    private val graphicsRef: WeakReference<GraphicsLibrary> = WeakReference(graphics)
     val graphics: GraphicsLibrary?
-        get() = graphicsRef.get()
-
-
-    private val graphicsPipelineRef: WeakReference<GraphicsPipeline> = WeakReference(graphicsPipeline)
     val graphicsPipeline: GraphicsPipeline?
-        get() = graphicsPipelineRef.get()
-
-
-    private var textureSlot = 0
+    val texture: GraphicsTexture?
 
     private var svn = 0.0f
 
@@ -71,10 +47,11 @@ class Zippo(graphicsPipeline: GraphicsPipeline,
 
 
     init {
-        graphics?.let { _gfx ->
-            textureSlot = _gfx.textureGenerate(bitmap)
-        }
-        println("textureSlot = " + textureSlot)
+
+        this.graphics = graphics
+        this.graphicsPipeline = graphicsPipeline
+        this.texture = texture
+
 
         gabbo = GraphicsArrayBuffer(graphics, zippoVertz)
 
@@ -135,12 +112,21 @@ class Zippo(graphicsPipeline: GraphicsPipeline,
 
 
         //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureSlot)
-        graphics?.textureBind(textureSlot)
+        //graphics?.textureBind(textureSlot)
 
         val program = graphicsPipeline!!.programSprite2D
 
-        GLES20.glUniform1i(program.uniformLocationTexture, 0)
+        //GLES20.glUniform1i(program.uniformLocationTexture, 0)
 
+        graphics?.uniformsTextureSet(graphicsPipeline?.programSprite2D, texture)
+
+        println("texture = " + texture)
+        texture?.let { _texture ->
+            println("texture wdth = " + _texture.width)
+            println("texture height = " + _texture.height)
+            println("texture textureIndex = " + _texture.textureIndex)
+
+        }
 
         //graphics?.uniformsModulateColorSet(graphicsPipeline?.programSprite2D, color)
 

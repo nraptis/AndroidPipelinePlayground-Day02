@@ -13,7 +13,6 @@ object FileUtils {
     fun getNumberOfBytesFromAsset(context: Context?, fileName: String?): Int {
         context?.let { _context ->
             fileName?.let { _fileName ->
-
                 try {
                     val inputStream = _context.assets.open(_fileName)
                     val numberOfBytes = inputStream.available()

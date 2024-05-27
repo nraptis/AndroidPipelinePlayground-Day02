@@ -50,27 +50,10 @@ class GraphicsRenderer(context: Context,
         graphics = GraphicsLibrary(activity, this, graphicsPipeline, surfaceView)
 
 
-        //starBackground = GraphicsTexture(context, graphics, "\"galaxy.jpg\"")
-
-        var bitmap: Bitmap?
-        var bitmap2: Bitmap?
+        starBackground = GraphicsTexture(context, graphics, "galaxy.jpg")
 
 
-        println("hello")
-
-        context.let {
-            bitmap = it?.let { it1 -> FileUtils.readFileFromAssetAsBitmap(it1, "earth_texture.jpg") }
-        }
-
-        context.let {
-            bitmap2 = it?.let { it1 -> FileUtils.readFileFromAssetAsBitmap(it1, "galaxy.jpg") }
-        }
-
-        println("bitmap = " + bitmap)
-        println("bitmap2 = " + bitmap2)
-
-
-        mZippo = Zippo(graphicsPipeline, bitmap, graphics)
+        mZippo = Zippo(graphicsPipeline, starBackground, graphics)
 
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.15f, 0.4f, 1.0f)
