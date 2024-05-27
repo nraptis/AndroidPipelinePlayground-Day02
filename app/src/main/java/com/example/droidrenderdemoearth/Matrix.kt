@@ -136,6 +136,24 @@ data class Matrix(
         )
     }
 
+    fun scale(scale: Float) {
+        m00 *= scale
+        m01 *= scale
+        m02 *= scale
+        m03 *= scale
+        m10 *= scale
+        m11 *= scale
+        m12 *= scale
+        m13 *= scale
+        m20 *= scale
+        m21 *= scale
+        m22 *= scale
+        m23 *= scale
+        //m30 * scale
+        //m31 * scale
+        //m32 * scale
+        //m33 * scale
+    }
 
     fun rotationZ(radians: Float) {
         val _cos = cos(radians)
@@ -151,6 +169,36 @@ data class Matrix(
     fun rotateZ(radians: Float) {
         val rotationMatrix = Matrix()
         rotationMatrix.rotationZ(radians)
+        multiply(rotationMatrix)
+    }
+
+    fun rotationY(radians: Float) {
+        val _cos = kotlin.math.cos(radians)
+        val _sin = kotlin.math.sin(radians)
+        make(m00 = _cos, m01 = 0.0f, m02 = -_sin, m03 = 0.0f,
+            m10 = 0.0f, m11 = 1.0f, m12 = 0.0f, m13 = 0.0f,
+            m20 = _sin, m21 = 0.0f, m22 = _cos, m23 = 0.0f,
+            m30 = 0.0f, m31 = 0.0f, m32 = 0.0f, m33 = 1.0f)
+    }
+
+    fun rotateY(radians: Float) {
+        val rotationMatrix = Matrix()
+        rotationMatrix.rotationY(radians)
+        multiply(rotationMatrix)
+    }
+
+    fun rotationX(radians: Float) {
+        val _cos = kotlin.math.cos(radians)
+        val _sin = kotlin.math.sin(radians)
+        make(m00 = 1.0f, m01 = 0.0f, m02 = 0.0f, m03 = 0.0f,
+            m10 = 0.0f, m11 = _cos, m12 = _sin, m13 = 0.0f,
+            m20 = 0.0f, m21 = -_sin, m22 = _cos, m23 = 0.0f,
+            m30 = 0.0f, m31 = 0.0f, m32 = 0.0f, m33 = 1.0f)
+    }
+
+    fun rotateX(radians: Float) {
+        val rotationMatrix = Matrix()
+        rotationMatrix.rotationX(radians)
         multiply(rotationMatrix)
     }
 

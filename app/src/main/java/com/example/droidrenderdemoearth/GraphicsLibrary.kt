@@ -46,14 +46,6 @@ class GraphicsLibrary(activity: GraphicsActivity?,
     }
 
 
-    fun programUse(shaderProgram: ShaderProgram?) {
-        shaderProgram?.let {
-            if (it.program != 0) {
-                GLES20.glUseProgram(it.program)
-            }
-        }
-    }
-
 
     fun bufferArrayGenerate(length: Int): Int {
         if (length > 0) {
@@ -319,5 +311,206 @@ class GraphicsLibrary(activity: GraphicsActivity?,
         }
         return -1
     }
+
+    fun blendSetAlpha() {
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+    }
+
+    fun blendSetDisabled() {
+        GLES20.glDisable(GLES20.GL_BLEND)
+    }
+
+
+    fun drawTriangles(indexBuffer: IntBuffer, count: Int) {
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, count, GLES20.GL_UNSIGNED_INT, indexBuffer)
+    }
+
+    fun drawTriangleStrips(indexBuffer: IntBuffer, count: Int) {
+        GLES20.glDrawElements(GLES20.GL_TRIANGLE_STRIP, count, GLES20.GL_UNSIGNED_INT, indexBuffer)
+    }
+
+
+
+    fun <T> linkBufferToShaderProgram(program: ShaderProgram?, buffer: GraphicsArrayBuffer<T>?) where T: FloatBufferable {
+        buffer?.let { _buffer ->
+            program?.let { _program ->
+
+                if (_program.program == 0) {
+                    return
+                }
+
+                if (_buffer.bufferIndex == -1) {
+                    return
+                }
+
+                GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, _buffer.bufferIndex)
+
+                GLES20.glUseProgram(_program.program)
+
+                if (_program.attributeLocationPosition != -1) {
+                    GLES20.glEnableVertexAttribArray(_program.attributeLocationPosition)
+
+                    GLES20.glVertexAttribPointer(_program.attributeLocationPosition,
+                        _program.attributeSizePosition,
+                        GLES20.GL_FLOAT,
+                        false,
+                        _program.attributeStridePosition,
+                        _program.attributeOffsetPosition)
+                }
+
+                if (_program.attributeLocationTextureCoordinates != -1) {
+                    GLES20.glEnableVertexAttribArray(_program.attributeLocationTextureCoordinates)
+
+                    GLES20.glVertexAttribPointer(_program.attributeLocationTextureCoordinates,
+                        _program.attributeSizeTextureCoordinates,
+                        GLES20.GL_FLOAT,
+                        false,
+                        _program.attributeStrideTextureCoordinates,
+                        _program.attributeOffsetTextureCoordinates)
+                }
+
+            }
+        }
+    }
+
+    fun unlinkBufferFromShaderProgram(program: ShaderProgram?) {
+
+        program?.let { _program ->
+
+            if (_program.program == 0) {
+                return
+            }
+
+
+            if (_program.attributeLocationTextureCoordinates != -1) {
+                GLES20.glDisableVertexAttribArray(program.attributeLocationTextureCoordinates)
+            }
+
+            if (_program.attributeLocationPosition != -1) {
+                GLES20.glDisableVertexAttribArray(_program.attributeLocationPosition)
+            }
+
+        }
+    }
+
+
+    // @Precondition: linkBufferToShaderProgram has been called with program.
+    fun uniformsModulateColorSet(program: ShaderProgram?, color: Color) {
+        program?.let { _program ->
+            if (_program.uniformLocationModulateColor != -1) {
+                GLES20.glUniform4f(_program.uniformLocationModulateColor, color.red, color.green, color.blue, color.alpha)
+            }
+        }
+    }
+
+    // @Precondition: linkBufferToShaderProgram has been called with program.
+    fun uniformsModulateColorSet(program: ShaderProgram?, buffer: FloatBuffer?) {
+        program?.let { _program ->
+            if (_program.uniformLocationModulateColor != -1) {
+                buffer.let { _buffer ->
+                    GLES20.glUniform4fv(_program.uniformLocationModulateColor, 1, _buffer)
+                }
+            }
+        }
+    }
+
+
+
+    // @Precondition: linkBufferToShaderProgram has been called with program.
+    fun uniformsProjectionMatrixSet(program: ShaderProgram?, buffer: FloatBuffer?) {
+        program?.let { _program ->
+            if (_program.uniformLocationProjectionMatrix != -1) {
+                buffer.let { _buffer ->
+                    GLES20.glUniformMatrix4fv(
+                        program.uniformLocationProjectionMatrix,
+                        1,
+                        false,
+                        _buffer
+                    )
+                }
+            }
+        }
+    }
+
+    // @Precondition: linkBufferToShaderProgram has been called with program.
+    fun uniformsProjectionMatrixSet(program: ShaderProgram?, matrix: Matrix?) {
+        program?.let { _program ->
+            if (_program.uniformLocationProjectionMatrix != -1) {
+                matrix?.let { _matrix ->
+                    val array = floatArrayOf(
+                        _matrix.m00, _matrix.m01, _matrix.m02, _matrix.m03,
+                        _matrix.m10, _matrix.m11, _matrix.m12, _matrix.m13,
+                        _matrix.m20, _matrix.m21, _matrix.m22, _matrix.m23,
+                        _matrix.m30, _matrix.m31, _matrix.m32, _matrix.m33)
+                    GLES20.glUniformMatrix4fv(
+                        program.uniformLocationProjectionMatrix,
+                        1,
+                        false,
+                        array,
+                        0
+                    )
+                }
+            }
+        }
+    }
+
+    // @Precondition: linkBufferToShaderProgram has been called with program.
+    fun uniformsModelViewMatrixSet(program: ShaderProgram?, buffer: FloatBuffer?) {
+        program?.let { _program ->
+            if (_program.uniformLocationModelViewMatrix != -1) {
+                buffer.let { _buffer ->
+                    GLES20.glUniformMatrix4fv(
+                        program.uniformLocationModelViewMatrix,
+                        1,
+                        false,
+                        _buffer
+                    )
+                }
+            }
+        }
+    }
+
+    // @Precondition: linkBufferToShaderProgram has been called with program.
+    fun uniformsModelViewMatrixSet(program: ShaderProgram?, matrix: Matrix?) {
+        program?.let { _program ->
+            if (_program.uniformLocationModelViewMatrix != -1) {
+                matrix?.let { _matrix ->
+                    val array = floatArrayOf(
+                        _matrix.m00, _matrix.m01, _matrix.m02, _matrix.m03,
+                        _matrix.m10, _matrix.m11, _matrix.m12, _matrix.m13,
+                        _matrix.m20, _matrix.m21, _matrix.m22, _matrix.m23,
+                        _matrix.m30, _matrix.m31, _matrix.m32, _matrix.m33
+                    )
+                    GLES20.glUniformMatrix4fv(
+                        program.uniformLocationModelViewMatrix,
+                        1,
+                        false,
+                        array,
+                        0
+                    )
+                }
+            }
+        }
+    }
+
+    /*
+
+
+    graphics?.linkBufferToShaderProgram(gabbo, graphicsPipeline?.programSprite2D)
+
+
+    //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureSlot)
+    graphics?.textureBind(textureSlot)
+
+    val program = graphicsPipeline!!.programSprite2D
+
+    GLES20.glUniform1i(program.uniformLocationTexture, 0)
+
+    //
+
+
+
+*/
 
 }

@@ -11,9 +11,8 @@ val zippoVertz = arrayOf(
     VertexSprite2D(-512.0f, -512.0f, 0.0f, 0.0f),
     VertexSprite2D(512.0f, -512.0f, 1.0f, 0.0f),
     VertexSprite2D(-512.0f, 512.0f, 0.0f, 1.0f),
-    VertexSprite2D(-512.0f, 512.0f, 1.0f, 0.0f),
-    VertexSprite2D(512.0f, -512.0f, 0.0f, 1.0f),
     VertexSprite2D(512.0f, 512.0f, 1.0f, 1.0f)
+
 )
 
 /*
@@ -31,12 +30,12 @@ class Zippo(graphicsPipeline: GraphicsPipeline,
             bitmap: Bitmap?,
                 graphics: GraphicsLibrary?) {
 
-    val indices = intArrayOf(0, 1, 2, 3, 4, 5)
+    val indices = intArrayOf(0, 1, 2, 3)
     val indexBuffer: IntBuffer
 
 
 
-    var color = Color(1.0f, 1.0f, 1.0f, 1.0f)
+    var color = Color(1.0f, 0.5f, 0.75f, 0.5f)
     var colorBuffer: FloatBuffer
 
     var projectionMatrix = Matrix()
@@ -82,7 +81,6 @@ class Zippo(graphicsPipeline: GraphicsPipeline,
 
         projectionMatrix.ortho(1080.0f, 2154.0f)
 
-
         colorBuffer = graphics?.floatBufferGenerate(color) ?: FloatBuffer.allocate(0)
         projectionMatrixBuffer = graphics?.floatBufferGenerate(projectionMatrix) ?: FloatBuffer.allocate(0)
 
@@ -92,63 +90,9 @@ class Zippo(graphicsPipeline: GraphicsPipeline,
 
         modelViewMatrixBuffer = graphics?.floatBufferGenerate(modelViewMatrix) ?: FloatBuffer.allocate(0)
 
-
         indexBuffer = graphics?.indexBufferGenerate(indices) ?: IntBuffer.allocate(0)
 
-        /*
-        val FbSize = graphics?.floatBufferSize(crumpVertz) ?: 0
-
-        println("FbSize = " + FbSize)
-
-        vertexBuffer = graphics?.floatBufferGenerate(crumpVertz) ?: FloatBuffer.allocate(0)
-
-
-
-        bufferIndex = graphics?.bufferArrayGenerate(FbSize * Float.SIZE_BYTES) ?: 0
-        graphics?.bufferArrayWrite(bufferIndex, FbSize * Float.SIZE_BYTES, vertexBuffer)
-        */
-
     }
-
-    /*
-    private var positionBuffer: FloatBuffer =
-        // Allocate buffer memory
-        ByteBuffer.allocateDirect(crumpsVertices.size * 6 * Float.SIZE_BYTES).run {
-            // Use native byte order
-            order(ByteOrder.nativeOrder())
-
-            // Create FloatBuffer from ByteBuffer
-            asFloatBuffer().apply {
-                // Add coordinates to FloatBuffer
-                crumpsVertices.forEach { vertex ->
-                    put(vertex.x)
-                    put(vertex.y)
-                }
-                // Reset buffer position to beginning
-                position(0)
-            }
-        }
-
-    private var textuerrerBuffer: FloatBuffer =
-        // Allocate buffer memory
-        ByteBuffer.allocateDirect(crumpsTexticies.size * 6 * Float.SIZE_BYTES).run {
-            // Use native byte order
-            order(ByteOrder.nativeOrder())
-
-            // Create FloatBuffer from ByteBuffer
-            asFloatBuffer().apply {
-                // Add coordinates to FloatBuffer
-                crumpsTexticies.forEach { vertex ->
-                    put(vertex.u)
-                    put(vertex.v)
-                }
-                // Reset buffer position to beginning
-                position(1)
-            }
-        }
-
-     */
-
 
     var spin = 0.0f
     fun draw() {
@@ -157,17 +101,22 @@ class Zippo(graphicsPipeline: GraphicsPipeline,
 
         svn += 0.01f
         if (svn > (2.0f * piFloat)) {
-            svn -=  2.0f * piFloat
+            svn -= 2.0f * piFloat
         }
 
         spin += 0.05f
         if (spin > (2.0f * piFloat)) {
-            spin -=  2.0f * piFloat
+            spin -= 2.0f * piFloat
         }
 
         val sineValue: Float = kotlin.math.sin(svn.toDouble()).toFloat()
 
 
+
+        color.blue = 0.5f + svn * 0.2f
+        color.red = 0.5f + spin * 0.2f
+
+        graphics?.floatBufferWrite(color, colorBuffer)
 
         //projectionMatrix.ortho(1080.0f, 2154.0f)
 
@@ -176,79 +125,47 @@ class Zippo(graphicsPipeline: GraphicsPipeline,
 
         modelViewMatrix.rotateZ(spin)
 
+        //modelViewMatrix.scale(kotlin.math.sin(spin) * 0.25f + 1.0f)
+
+
         graphics?.floatBufferWrite(modelViewMatrix, modelViewMatrixBuffer)
 
-        //ModelViewMatrix *
 
-        //zippoVertz[3].x = 600.0f + sineValue * 100.0f
-        //graphics?.floatBufferWrite(crumpVertz, vertexBuffer)
-        //graphics?.bufferArrayWrite(bufferIndex, FbSize * Float.SIZE_BYTES, vertexBuffer)
-
-        gabbo.write(zippoVertz)
-
-        graphicsPipeline?.programSprite2D?.let { program ->
-
-            //GLES20.glUseProgram(_shaderLibrary.DEMO___spriteProgram)
-            graphics?.programUse(program)
+        graphics?.linkBufferToShaderProgram(graphicsPipeline?.programSprite2D, gabbo)
 
 
-            //GLES20.glBindBuffer()
+        //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureSlot)
+        graphics?.textureBind(textureSlot)
+
+        val program = graphicsPipeline!!.programSprite2D
+
+        GLES20.glUniform1i(program.uniformLocationTexture, 0)
 
 
-            // Enable a handle to the triangle vertices
-            GLES20.glEnableVertexAttribArray(program.attributeLocationPosition)
-            GLES20.glEnableVertexAttribArray(program.attributeLocationTextureCoordinates)
+        //graphics?.uniformsModulateColorSet(graphicsPipeline?.programSprite2D, color)
 
-            // Bind the texture
+        graphics?.uniformsModulateColorSet(graphicsPipeline?.programSprite2D, colorBuffer)
 
-            //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureSlot)
-            graphics?.textureBind(textureSlot)
-
-            GLES20.glUniform1i(program.uniformLocationTexture, 0)
-
-            GLES20.glUniform4f(program.uniformLocationModulateColor,
-                color.red, color.green, color.blue, color.alpha)
+        //GLES20.glUniform4f(program.uniformLocationModulateColor, color.red, color.green, color.blue, color.alpha)
+        //GLES20.glUniform4fv(program.uniformLocationModulateColor, 1, colorBuffer)
 
 
-            GLES20.glUniformMatrix4fv(program.uniformLocationProjectionMatrix, 1, false, projectionMatrixBuffer)
-            GLES20.glUniformMatrix4fv(program.uniformLocationModelViewMatrix, 1, false, modelViewMatrixBuffer)
+        //graphics?.uniformsProjectionMatrixSet(graphicsPipeline?.programSprite2D, projectionMatrixBuffer)
 
-            //glUniformMatrix4fv(mSlotNormalMatrixUniform, 1, 0, aUniform->mNormal.m);
-            //glUniform4f(mSlotAmbient, aUniform->mLight.mRed, aUniform->mLight.mGreen, aUniform->mLight.mBlue,aUniform->mLight.mAmbientIntensity);
-            //glUniform4f(mSlotDiffuse, aUniform->mLight.mDirX, aUniform->mLight.mDirY, aUniform->mLight.mDirZ, aUniform->mLight.mDiffuseIntensity);
-            //glUniform4f(mSlotSpecular, aUniform->mLight.mSpotlightX, aUniform->mLight.mSpotlightY, aUniform->mLight.mSpotlightZ, aUniform->mLight.mSpecularIntensity);
-            //glUniform2f(mSlotMaterial, aUniform->mLight.mShininess, aUniform->mLight.mEmissions);
+        graphics?.uniformsProjectionMatrixSet(graphicsPipeline?.programSprite2D, projectionMatrix)
 
-            //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, bufferIndex)
-            graphics?.bufferArrayBind(gabbo)
+        graphics?.uniformsModelViewMatrixSet(graphicsPipeline?.programSprite2D, modelViewMatrixBuffer)
 
-            GLES20.glEnableVertexAttribArray(program.attributeLocationPosition)
-            // Prepare the triangle coordinate data
+        graphics?.blendSetAlpha()
 
-            GLES20.glVertexAttribPointer(program.attributeLocationPosition,
-                2, GLES20.GL_FLOAT, false, Float.SIZE_BYTES * 4, 0)
+        graphics?.drawTriangleStrips(indexBuffer, 4)
 
+        graphics?.unlinkBufferFromShaderProgram (graphicsPipeline?.programSprite2D)
 
-
-            GLES20.glEnableVertexAttribArray(program.attributeLocationTextureCoordinates)
-            // Prepare the triangle coordinate data
-
-            GLES20.glVertexAttribPointer(program.attributeLocationTextureCoordinates,
-                2, GLES20.GL_FLOAT, false, Float.SIZE_BYTES * 4, Float.SIZE_BYTES * 2)
-
-
-            GLES20.glEnable(GLES20.GL_BLEND);
-            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-
-            GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_INT, indexBuffer)
-
-            // Disable vertex array
-            GLES20.glDisableVertexAttribArray(program.attributeLocationPosition)
-            GLES20.glDisableVertexAttribArray(program.attributeLocationTextureCoordinates)
-
-
-        }
     }
+
+
+
 }
 
 

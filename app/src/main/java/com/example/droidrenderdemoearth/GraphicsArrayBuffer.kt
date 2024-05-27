@@ -4,6 +4,11 @@ import java.lang.ref.WeakReference
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
+
+// Statically allocated graphics buffer.
+// The content can be replaced, but it cannot
+// change size...
+
 class GraphicsArrayBuffer<T : FloatBufferable> {
 
     var graphics: GraphicsLibrary?
@@ -29,8 +34,6 @@ class GraphicsArrayBuffer<T : FloatBufferable> {
             vertexBuffer?.let {
                 _graphics.bufferArrayWrite(bufferIndex, size, it)
             }
-
-
         }
     }
 

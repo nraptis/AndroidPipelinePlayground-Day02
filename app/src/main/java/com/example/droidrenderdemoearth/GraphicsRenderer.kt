@@ -30,10 +30,9 @@ class GraphicsRenderer(context: Context,
         get() = activityRef.get()
 
 
-
-    private lateinit var mCrumpster: Crumpster
-
     private lateinit var mZippo: Zippo
+
+    private  lateinit var starBackground: GraphicsTexture
 
 
 
@@ -48,8 +47,10 @@ class GraphicsRenderer(context: Context,
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
 
         graphicsPipeline = GraphicsPipeline(context ?: return)
-
         graphics = GraphicsLibrary(activity, this, graphicsPipeline, surfaceView)
+
+
+        //starBackground = GraphicsTexture(context, graphics, "\"galaxy.jpg\"")
 
         var bitmap: Bitmap?
         var bitmap2: Bitmap?
@@ -65,10 +66,11 @@ class GraphicsRenderer(context: Context,
             bitmap2 = it?.let { it1 -> FileUtils.readFileFromAssetAsBitmap(it1, "galaxy.jpg") }
         }
 
-        mCrumpster = Crumpster(graphicsPipeline, bitmap, graphics)
+        println("bitmap = " + bitmap)
+        println("bitmap2 = " + bitmap2)
 
 
-        mZippo = Zippo(graphicsPipeline, bitmap2, graphics)
+        mZippo = Zippo(graphicsPipeline, bitmap, graphics)
 
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.15f, 0.4f, 1.0f)
@@ -77,8 +79,6 @@ class GraphicsRenderer(context: Context,
     override fun onDrawFrame(unused: GL10) {
         // Redraw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-
-        mCrumpster.draw()
 
         mZippo.draw()
 

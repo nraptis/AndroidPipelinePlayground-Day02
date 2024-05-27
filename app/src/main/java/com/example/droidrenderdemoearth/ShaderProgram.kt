@@ -12,6 +12,18 @@ open class ShaderProgram(name: String, val vertexShader: Int, val fragmentShader
     var uniformLocationProjectionMatrix = -1
     var uniformLocationModelViewMatrix = -1
 
+
+    var attributeStridePosition = -1
+    var attributeSizePosition = -1
+    var attributeOffsetPosition = -1
+
+    var attributeStrideTextureCoordinates = -1
+    var attributeSizeTextureCoordinates = -1
+    var attributeOffsetTextureCoordinates = -1
+
+
+
+
     init {
         if ((vertexShader > 0) && (fragmentShader > 0)) {
             program = loadProgram(vertexShader, fragmentShader)
