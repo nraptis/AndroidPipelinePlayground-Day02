@@ -15,28 +15,8 @@ class GraphicsActivity : Activity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Create a GLSurfaceView instance and set it
-        // as the ContentView for this Activity.
-
-        val width: Int = this.resources.displayMetrics.widthPixels
-        val height: Int = this.resources.displayMetrics.heightPixels
-
-        println("width = " + width)
-        println("height = " + height)
-
-
         gLView = GraphicsSurfaceView(this)
         setContentView(gLView)
-
-
-
-        val fileContentz1 = FileUtils.readFileFromAssetAsString(this, "shim_sham.txt")
-        println(fileContentz1)
-
-        val fileContentz2 = FileUtils.readFileFromAssetAsString(this, "shim_sham_sjimmy.txt")
-        println(fileContentz2)
-
     }
 
     override fun onPause() {

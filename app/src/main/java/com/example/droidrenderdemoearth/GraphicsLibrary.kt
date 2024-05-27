@@ -19,7 +19,15 @@ import java.nio.IntBuffer
 class GraphicsLibrary(activity: GraphicsActivity?,
                       renderer: GraphicsRenderer?,
                       pipeline: GraphicsPipeline?,
-                      surfaceView: GraphicsSurfaceView?) {
+                      surfaceView: GraphicsSurfaceView?,
+                      width: Int,
+                      height: Int) {
+
+    var width: Int
+    var height: Int
+    var widthf: Float
+    var heightf: Float
+
 
 
     private val activityRef: WeakReference<GraphicsActivity> = WeakReference(activity)
@@ -41,6 +49,12 @@ class GraphicsLibrary(activity: GraphicsActivity?,
 
 
     init {
+
+        this.width = width
+        this.height = height
+        this.widthf = width.toFloat()
+        this.heightf = height.toFloat()
+
         textureSetFilterLinear()
         textureSetClamp()
     }

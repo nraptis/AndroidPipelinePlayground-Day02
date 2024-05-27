@@ -7,32 +7,24 @@ import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
 
-val zippoVertz = arrayOf(
-    VertexSprite2D(-512.0f, -512.0f, 0.0f, 0.0f),
-    VertexSprite2D(512.0f, -512.0f, 1.0f, 0.0f),
-    VertexSprite2D(-512.0f, 512.0f, 0.0f, 1.0f),
-    VertexSprite2D(512.0f, 512.0f, 1.0f, 1.0f)
-)
-
 class Zippo(graphicsPipeline: GraphicsPipeline?,
             texture: GraphicsTexture?,
             graphics: GraphicsLibrary?) {
 
+    val zippoVertz = arrayOf(
+        VertexSprite2D(-512.0f, -512.0f, 0.0f, 0.0f),
+        VertexSprite2D(512.0f, -512.0f, 1.0f, 0.0f),
+        VertexSprite2D(-512.0f, 512.0f, 0.0f, 1.0f),
+        VertexSprite2D(512.0f, 512.0f, 1.0f, 1.0f)
+    )
+
     val indices = intArrayOf(0, 1, 2, 3)
     val indexBuffer: IntBuffer
 
-
-
     var color = Color(1.0f, 1.0f, 1.0f, 1.0f)
-    var colorBuffer: FloatBuffer
 
     var projectionMatrix = Matrix()
-    var projectionMatrixBuffer: FloatBuffer
-
-
     var modelViewMatrix = Matrix()
-    var modelViewMatrixBuffer: FloatBuffer
-
 
     val graphics: GraphicsLibrary?
     val graphicsPipeline: GraphicsPipeline?
@@ -40,11 +32,7 @@ class Zippo(graphicsPipeline: GraphicsPipeline?,
 
     private var svn = 0.0f
 
-    val gabbo: GraphicsArrayBuffer<VertexSprite2D>
-
-    //val vertexBuffer: FloatBuffer
-    //var bufferIndex: Int
-
+    val vertexBuffer: GraphicsArrayBuffer<VertexSprite2D>
 
     init {
 
@@ -52,23 +40,11 @@ class Zippo(graphicsPipeline: GraphicsPipeline?,
         this.graphicsPipeline = graphicsPipeline
         this.texture = texture
 
+        vertexBuffer = GraphicsArrayBuffer(graphics, zippoVertz)
 
-        gabbo = GraphicsArrayBuffer(graphics, zippoVertz)
-
-
-        projectionMatrix.ortho(1080.0f, 2154.0f)
-
-        colorBuffer = graphics?.floatBufferGenerate(color) ?: FloatBuffer.allocate(0)
-        projectionMatrixBuffer = graphics?.floatBufferGenerate(projectionMatrix) ?: FloatBuffer.allocate(0)
-
-        for (i in 0 until projectionMatrixBuffer.limit()) {
-            println("index: $i = ${projectionMatrixBuffer[i]}")
-        }
-
-        modelViewMatrixBuffer = graphics?.floatBufferGenerate(modelViewMatrix) ?: FloatBuffer.allocate(0)
-
+        projectionMatrix.ortho(graphics?.widthf ?: 0.0f,
+            graphics?.heightf ?: 0.0f)
         indexBuffer = graphics?.indexBufferGenerate(indices) ?: IntBuffer.allocate(0)
-
     }
 
     var spin = 0.0f
@@ -81,76 +57,34 @@ class Zippo(graphicsPipeline: GraphicsPipeline?,
             svn -= 2.0f * piFloat
         }
 
-        spin += 0.05f
+        spin += 0.005f
         if (spin > (2.0f * piFloat)) {
             spin -= 2.0f * piFloat
         }
 
-        val sineValue: Float = kotlin.math.sin(svn.toDouble()).toFloat()
-
-
-
         color.blue = 0.5f + svn * 0.2f
         color.red = 0.5f + spin * 0.2f
 
-        graphics?.floatBufferWrite(color, colorBuffer)
+        val width = graphics?.widthf ?: 0.0f
+        val height = graphics?.heightf ?: 0.0f
 
-        //projectionMatrix.ortho(1080.0f, 2154.0f)
 
-
-        modelViewMatrix.translation(1080.0f / 2.0f, 2154.0f / 2.0f, 0.0f)
-
+        modelViewMatrix.translation(width / 4.0f, height / 4.0f, 0.0f)
         modelViewMatrix.rotateZ(spin)
-
-        //modelViewMatrix.scale(kotlin.math.sin(spin) * 0.25f + 1.0f)
-
-
-        graphics?.floatBufferWrite(modelViewMatrix, modelViewMatrixBuffer)
-
-
-        graphics?.linkBufferToShaderProgram(graphicsPipeline?.programSprite2D, gabbo)
-
-
-        //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureSlot)
-        //graphics?.textureBind(textureSlot)
-
-        val program = graphicsPipeline!!.programSprite2D
-
-        //GLES20.glUniform1i(program.uniformLocationTexture, 0)
-
-        graphics?.uniformsTextureSet(graphicsPipeline?.programSprite2D, texture)
-
-        println("texture = " + texture)
-        texture?.let { _texture ->
-            println("texture wdth = " + _texture.width)
-            println("texture height = " + _texture.height)
-            println("texture textureIndex = " + _texture.textureIndex)
-
-        }
-
-        //graphics?.uniformsModulateColorSet(graphicsPipeline?.programSprite2D, color)
-
-        graphics?.uniformsModulateColorSet(graphicsPipeline?.programSprite2D, colorBuffer)
-
-        //GLES20.glUniform4f(program.uniformLocationModulateColor, color.red, color.green, color.blue, color.alpha)
-        //GLES20.glUniform4fv(program.uniformLocationModulateColor, 1, colorBuffer)
-
-
-        //graphics?.uniformsProjectionMatrixSet(graphicsPipeline?.programSprite2D, projectionMatrixBuffer)
-
-        graphics?.uniformsProjectionMatrixSet(graphicsPipeline?.programSprite2D, projectionMatrix)
-
-        graphics?.uniformsModelViewMatrixSet(graphicsPipeline?.programSprite2D, modelViewMatrixBuffer)
+        modelViewMatrix.scale(0.5f)
 
         graphics?.blendSetAlpha()
 
+        graphics?.linkBufferToShaderProgram(graphicsPipeline?.programSprite2D, vertexBuffer)
+
+        graphics?.uniformsTextureSet(graphicsPipeline?.programSprite2D, texture)
+        graphics?.uniformsModulateColorSet(graphicsPipeline?.programSprite2D, color)
+        graphics?.uniformsProjectionMatrixSet(graphicsPipeline?.programSprite2D, projectionMatrix)
+        graphics?.uniformsModelViewMatrixSet(graphicsPipeline?.programSprite2D, modelViewMatrix)
+
         graphics?.drawTriangleStrips(indexBuffer, 4)
-
         graphics?.unlinkBufferFromShaderProgram (graphicsPipeline?.programSprite2D)
-
     }
-
-
 
 }
 

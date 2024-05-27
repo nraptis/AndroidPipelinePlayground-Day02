@@ -8,19 +8,14 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import java.lang.ref.WeakReference
 
-class GraphicsRenderer(context: Context,
+class GraphicsRenderer(var context: Context?,
                        activity: GraphicsActivity?,
-                       surfaceView: GraphicsSurfaceView?) : GLSurfaceView.Renderer {
-
+                       surfaceView: GraphicsSurfaceView?,
+                       var width: Int,
+                       var height: Int) : GLSurfaceView.Renderer {
 
     private lateinit var graphicsPipeline: GraphicsPipeline
-
     private lateinit var graphics: GraphicsLibrary
-
-    private val contextRef: WeakReference<Context> = WeakReference(context)
-    val context: Context?
-        get() = contextRef.get()
-
     private val surfaceViewRef: WeakReference<GraphicsSurfaceView> = WeakReference(surfaceView)
     val surfaceView: GraphicsSurfaceView?
         get() = surfaceViewRef.get()
@@ -32,6 +27,16 @@ class GraphicsRenderer(context: Context,
 
     private lateinit var mZippo: Zippo
 
+    private lateinit var mYodel: Yodel
+
+
+    private lateinit var mZebraHoof: ZebraHoof
+
+    private lateinit var mEarth: Earth
+
+
+
+
     private  lateinit var starBackground: GraphicsTexture
 
 
@@ -41,19 +46,25 @@ class GraphicsRenderer(context: Context,
 
     init {
 
+        print("Renderer Width: " + width)
+        print("Renderer Height: " + height)
 
     }
 
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
 
         graphicsPipeline = GraphicsPipeline(context ?: return)
-        graphics = GraphicsLibrary(activity, this, graphicsPipeline, surfaceView)
-
+        graphics = GraphicsLibrary(activity, this, graphicsPipeline, surfaceView, width, height)
 
         starBackground = GraphicsTexture(context, graphics, "galaxy.jpg")
 
+        mEarth = Earth(graphics, graphicsPipeline)
 
         mZippo = Zippo(graphicsPipeline, starBackground, graphics)
+        mYodel = Yodel(graphicsPipeline, graphics)
+        mZebraHoof = ZebraHoof(graphicsPipeline, graphics, mEarth)
+
+
 
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.15f, 0.4f, 1.0f)
@@ -62,9 +73,9 @@ class GraphicsRenderer(context: Context,
     override fun onDrawFrame(unused: GL10) {
         // Redraw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-
         mZippo.draw()
-
+        mYodel.draw()
+        mZebraHoof.draw()
         surfaceView?.requestRender()
     }
 

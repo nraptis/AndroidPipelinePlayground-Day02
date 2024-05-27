@@ -13,77 +13,49 @@ class GraphicsPipeline(context: Context) {
 
 
 
-
-    val DEMO___spriteVertex: Int
-    val DEMO_____spriteFragment: Int
-    //val DEMO___spriteProgram: Int
-    val shaderProgramSpriteDemo: ShaderProgramSpriteDemo
-
     val functionSprite2DVertex: Int
     val functionSprite2DFragment: Int
-
     var programSprite2D: ShaderProgramSprite2D
 
-    //sprite_2d_vertex.glsl
-    //sprite_2d_fragment.glsl
+    val functionShape2DVertex: Int
+    val functionShape2DFragment: Int
+    var programShape2D: ShaderProgramShape2D
 
+    val functionSprite3DVertex: Int
+    val functionSprite3DFragment: Int
+    var programSprite3D: ShaderProgramSprite3D
 
+    val functionShape3DVertex: Int
+    val functionShape3DFragment: Int
+    var programShape3D: ShaderProgramShape3D
 
+    /*
+    shape_2d_fragment.glsl
+    shape_2d_vertex.glsl
+    shape_3d_fragment.glsl
+    shape_3d_vertex.glsl
 
-    //uniform mat4 ProjectionMatrix;
-    //uniform mat4 ModelViewMatrix;
-    //attribute vec2 Positions;
-    //attribute vec2 TextureCoordinates;
-
-    //uniform lowp vec4 ModulateColor;
-    //varying lowp vec2 TextureCoordinatesOut;
-    //uniform sampler2D Texture;
-
-
-    //positionHandle = GLES20.glGetAttribLocation(_shaderLibrary.DEMO___spriteProgram, "Positions").also { pozition ->
-
-
-        //textoeHandle = GLES20.glGetAttribLocation(_shaderLibrary.DEMO___spriteProgram, "TextureCoords").also { texxztt ->
-
-            //GLES20.glUniform1i(GLES20.glGetUniformLocation(_shaderLibrary.DEMO___spriteProgram, "Texture"), 0)
-
-
-
-
-            //val spriteVertex: Int
-    //val spriteFragment: Int
-    //val spriteProgram: Int
-
-
-    //sprite_vertex_shader.glsl
-    //sprite_fragment_shader.glsl
-
-
+     */
 
 
     init {
 
-
-
-        DEMO___spriteVertex = loadShaderVertex("texture_test_vertex.glsl")
-        DEMO_____spriteFragment = loadShaderFragment("texture_test_fragment.glsl")
-        //DEMO___spriteProgram = loadProgram(DEMO___spriteVertex, DEMO_____spriteFragment)
-        shaderProgramSpriteDemo = ShaderProgramSpriteDemo("DEMO_SPrITe",
-            DEMO___spriteVertex,
-            DEMO_____spriteFragment)
-
         functionSprite2DVertex = loadShaderVertex("sprite_2d_vertex.glsl")
         functionSprite2DFragment = loadShaderFragment("sprite_2d_fragment.glsl")
-
         programSprite2D = ShaderProgramSprite2D("sprite_2d", functionSprite2DVertex, functionSprite2DFragment)
 
+        functionShape2DVertex = loadShaderVertex("shape_2d_vertex.glsl")
+        functionShape2DFragment = loadShaderFragment("shape_2d_fragment.glsl")
+        programShape2D = ShaderProgramShape2D("shape_2d", functionShape2DVertex, functionShape2DFragment)
 
 
+        functionSprite3DVertex = loadShaderVertex("sprite_3d_vertex.glsl")
+        functionSprite3DFragment = loadShaderFragment("sprite_3d_fragment.glsl")
+        programSprite3D = ShaderProgramSprite3D("sprite_3d", functionSprite3DVertex, functionSprite3DFragment)
 
-
-
-        //
-        //
+        functionShape3DVertex = loadShaderVertex("shape_3d_vertex.glsl")
+        functionShape3DFragment = loadShaderFragment("shape_3d_fragment.glsl")
+        programShape3D = ShaderProgramShape3D("shape_3d", functionShape3DVertex, functionShape3DFragment)
 
 
     }

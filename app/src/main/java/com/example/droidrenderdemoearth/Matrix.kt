@@ -343,4 +343,35 @@ data class Matrix(
         m23 = m23Result
         m33 = m33Result
     }
+
+    fun process(point3: Float3): Float3 {
+        val x =
+            m00 * point3.x + m10 * point3.y + m20 * point3.z + m30
+        val y =
+            m01 * point3.x + m11 * point3.y + m21 * point3.z + m31
+        val z =
+            m02 * point3.x + m12 * point3.y + m22 * point3.z + m32
+        val w = m03 * point3.x + m13 * point3.y + m23 * point3.z + m33
+        return if (kotlin.math.abs(w) > epsilon) {
+            val scale = 1.0f / w
+            Float3(x * scale, y * scale, z * scale)
+        } else {
+            Float3(x, y, z)
+        }
+    }
+
+    fun processRotationOnly(point3: Float3): Float3 {
+        val x =
+            m00 * point3.x + m10 * point3.y + m20 * point3.z
+        val y =
+            m01 * point3.x + m11 * point3.y + m21 * point3.z
+        val z =
+            m02 * point3.x + m12 * point3.y + m22 * point3.z
+        return Float3(x, y, z)
+    }
+
+    companion object {
+        const val epsilon = 0.0001f
+    }
+
 }
