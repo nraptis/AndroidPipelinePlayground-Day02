@@ -7,6 +7,7 @@ import javax.microedition.khronos.opengles.GL10
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import java.lang.ref.WeakReference
+import java.nio.IntBuffer
 
 class GraphicsRenderer(var context: Context?,
                        activity: GraphicsActivity?,
@@ -26,27 +27,14 @@ class GraphicsRenderer(var context: Context?,
 
 
     private lateinit var mZippo: Zippo
-
     private lateinit var mYodel: Yodel
-
-
     private lateinit var mZebraHoof: ZebraHoof
-
     private lateinit var mZig: Zig
-
-
-
 
     private lateinit var mEarth: Earth
 
-
-
-
     private  lateinit var starBackground: GraphicsTexture
     private  lateinit var earthMap: GraphicsTexture
-
-
-
 
 
 
@@ -58,10 +46,76 @@ class GraphicsRenderer(var context: Context?,
 
     }
 
+    var frameBufferIndex = -1
+
+    var renderBufferIndex = -1
+
+
+    var junkText = -1
+
+    val zippoVertz = arrayOf(
+        VertexSprite2D(-512.0f, -512.0f, 0.0f, 0.0f),
+        VertexSprite2D(512.0f, -512.0f, 1.0f, 0.0f),
+        VertexSprite2D(-512.0f, 512.0f, 0.0f, 1.0f),
+        VertexSprite2D(512.0f, 512.0f, 1.0f, 1.0f)
+    )
+
+    val indices = intArrayOf(0, 1, 2, 3)
+    lateinit var indexBuffer: IntBuffer
+    lateinit var vertexBuffer: GraphicsArrayBuffer<VertexSprite2D>
+
+    var projectionMatrix = Matrix()
+    var modelViewMatrix = Matrix()
+
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
+
 
         graphicsPipeline = GraphicsPipeline(context ?: return)
         graphics = GraphicsLibrary(activity, this, graphicsPipeline, surfaceView, width, height)
+
+
+
+
+
+
+
+
+
+        junkText = graphics.textureGenerate(width, height)
+
+        vertexBuffer = GraphicsArrayBuffer(graphics, zippoVertz)
+        indexBuffer = graphics?.indexBufferGenerate(indices) ?: IntBuffer.allocate(0)
+
+
+
+        val frameBufferHandle = IntArray(1)
+        GLES20.glGenFramebuffers(1, frameBufferHandle, 0)
+        frameBufferIndex = frameBufferHandle[0]
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBufferIndex)
+
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, junkText, 0)
+
+
+
+        val renderBufferHandle = IntArray(1)
+        GLES20.glGenFramebuffers(1, frameBufferHandle, 0)
+        renderBufferIndex = renderBufferHandle[0]
+
+        GLES20.glGenRenderbuffers(1, renderBufferHandle, 0)
+        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, renderBufferIndex)
+        GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, width, height)
+        GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_RENDERBUFFER, renderBufferIndex)
+
+
+
+        println("frameBufferIndex = " + frameBufferIndex)
+
+
+
+
+
+
 
         starBackground = GraphicsTexture(context, graphics, "galaxy.jpg")
         earthMap = GraphicsTexture(context, graphics, "earth_texture.jpg")
@@ -77,17 +131,87 @@ class GraphicsRenderer(var context: Context?,
 
 
 
+
+
         // Set the background frame color
-        GLES20.glClearColor(0.0f, 0.15f, 0.4f, 1.0f)
+
     }
 
+    var spin = 0.0f
     override fun onDrawFrame(unused: GL10) {
         // Redraw background color
+
+        val piFloat: Float = kotlin.math.PI.toFloat()
+        spin -= 0.01f
+        if (spin < 0.0f) {
+            spin += 2.0f * piFloat
+        }
+
+        projectionMatrix.ortho(1024.0f,
+            1024.0f)
+        modelViewMatrix.translation(width / 4.0f, height / 4.0f, 0.0f)
+        modelViewMatrix.rotateZ(spin)
+        modelViewMatrix.scale(0.5f)
+
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
+        GLES20.glClearColor(1.0f, 0.15f, 0.4f, 1.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-        mZippo.draw()
-        mYodel.draw()
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBufferIndex)
+        GLES20.glClearColor(0.0f, 0.15f, 0.4f, 1.0f)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+
+
         mZebraHoof.draw()
         mZig.draw()
+        mZippo.draw()
+        mYodel.draw()
+
+
+
+
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBufferIndex)
+
+        mZippo.draw()
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
+
+        mYodel.draw()
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
+
+
+
+        if (true) {
+
+            val color = Color(1.0f, 0.0f, 0.5f, 0.5f)
+
+            graphics?.blendSetAlpha()
+
+            graphics?.linkBufferToShaderProgram(graphicsPipeline?.programSprite2D, vertexBuffer)
+
+            graphics?.uniformsTextureSet(graphicsPipeline?.programSprite2D, junkText)
+            graphics?.uniformsModulateColorSet(graphicsPipeline?.programSprite2D, color)
+            graphics?.uniformsProjectionMatrixSet(
+                graphicsPipeline?.programSprite2D,
+                projectionMatrix
+            )
+            graphics?.uniformsModelViewMatrixSet(graphicsPipeline?.programSprite2D, modelViewMatrix)
+
+            graphics?.drawTriangleStrips(indexBuffer, 4)
+            graphics?.unlinkBufferFromShaderProgram(graphicsPipeline?.programSprite2D)
+        }
+
+
+        mZebraHoof.draw()
+
+        mZig.draw()
+
+
+
+
         surfaceView?.requestRender()
     }
 

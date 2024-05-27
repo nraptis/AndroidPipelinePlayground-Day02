@@ -9,6 +9,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
+import kotlin.random.Random
 
 // This is re-usable code, wrapping paper for OpenGL
 // and all depends on already having the OpenGL context...
@@ -326,6 +327,49 @@ class GraphicsLibrary(activity: GraphicsActivity?,
         return -1
     }
 
+    fun textureGenerate(width: Int, height: Int): Int {
+
+        val textureHandle = IntArray(1)
+        GLES20.glGenTextures(1, textureHandle, 0)
+
+        if (textureHandle[0] != 0) {
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
+
+
+            val pixels = IntArray(width * height) { 0 }
+
+            textureSetFilterLinear()
+            textureSetClamp()
+
+            // Convert ARGB to RGBA
+            val buffer = ByteBuffer.allocateDirect(pixels.size * 4)
+            buffer.order(ByteOrder.nativeOrder())
+            for (color in pixels) {
+                val alpha = Random.nextInt(0, 256)
+                val red = Random.nextInt(0, 256)
+                val green = Random.nextInt(0, 256)
+                val blue = Random.nextInt(0, 256)
+                val rgba = ((alpha shl 24) and 0xFF000000.toInt()) or
+                        ((green shl 8) and 0x0000FF00) or
+                        ((blue shl 16) and 0x00FF0000) or
+                        (red and 0x000000FF)
+                buffer.putInt(rgba)
+            }
+            buffer.position(0)
+
+            GLES20.glTexImage2D(
+                GLES20.GL_TEXTURE_2D,
+                0,
+                GLES20.GL_RGBA, width, height,
+                0,
+                GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buffer
+            )
+        }
+        return textureHandle[0]
+
+
+    }
+
     fun blendSetAlpha() {
         GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
@@ -515,13 +559,30 @@ class GraphicsLibrary(activity: GraphicsActivity?,
         program?.let { _program ->
             if (_program.uniformLocationTexture != -1) {
                 texture?.let { _texture ->
+                    if (_texture.textureIndex != -1) {
+                        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+                        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _texture.textureIndex)
+                        GLES20.glUniform1i(_program.uniformLocationTexture, 0)
+                    }
+                }
+            }
+        }
+    }
+
+    // @Precondition: linkBufferToShaderProgram has been called with program.
+    // @Precondition: the texture is expected to be used on GL_TEXTURE0...
+    fun uniformsTextureSet(program: ShaderProgram?, textureIndex: Int) {
+        program?.let { _program ->
+            if (_program.uniformLocationTexture != -1) {
+                if (textureIndex != -1) {
                     GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-                    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _texture.textureIndex)
+                    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureIndex)
                     GLES20.glUniform1i(_program.uniformLocationTexture, 0)
                 }
             }
         }
     }
+
 
     //graphics?.linkBufferToShaderProgram(graphicsPipeline?.programSprite2D, gabbo)
 

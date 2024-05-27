@@ -15,7 +15,6 @@ class ShaderProgramSprite3D(name: String, vertexShader: Int, fragmentShader: Int
         uniformLocationProjectionMatrix = getUniformLocation("ProjectionMatrix")
         uniformLocationModelViewMatrix = getUniformLocation("ModelViewMatrix")
 
-
         println("===> " + name + " ... " + "attributeLocationPosition = " + attributeLocationPosition)
         println("===> " + name + " ... " + "attributeLocationTextureCoordinates = " + attributeLocationTextureCoordinates)
 
