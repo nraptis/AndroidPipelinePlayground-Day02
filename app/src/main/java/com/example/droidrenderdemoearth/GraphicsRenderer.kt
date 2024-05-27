@@ -32,12 +32,19 @@ class GraphicsRenderer(var context: Context?,
 
     private lateinit var mZebraHoof: ZebraHoof
 
+    private lateinit var mZig: Zig
+
+
+
+
     private lateinit var mEarth: Earth
 
 
 
 
     private  lateinit var starBackground: GraphicsTexture
+    private  lateinit var earthMap: GraphicsTexture
+
 
 
 
@@ -57,12 +64,16 @@ class GraphicsRenderer(var context: Context?,
         graphics = GraphicsLibrary(activity, this, graphicsPipeline, surfaceView, width, height)
 
         starBackground = GraphicsTexture(context, graphics, "galaxy.jpg")
+        earthMap = GraphicsTexture(context, graphics, "earth_texture.jpg")
 
         mEarth = Earth(graphics, graphicsPipeline)
 
         mZippo = Zippo(graphicsPipeline, starBackground, graphics)
         mYodel = Yodel(graphicsPipeline, graphics)
         mZebraHoof = ZebraHoof(graphicsPipeline, graphics, mEarth)
+
+
+        mZig = Zig(graphicsPipeline, graphics, earthMap, mEarth)
 
 
 
@@ -76,6 +87,7 @@ class GraphicsRenderer(var context: Context?,
         mZippo.draw()
         mYodel.draw()
         mZebraHoof.draw()
+        mZig.draw()
         surfaceView?.requestRender()
     }
 

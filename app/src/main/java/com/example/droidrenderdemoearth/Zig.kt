@@ -1,10 +1,11 @@
 package com.example.droidrenderdemoearth
 
-import java.nio.IntBuffer
 
-class ZebraHoof(graphicsPipeline: GraphicsPipeline?,
-                graphics: GraphicsLibrary?,
-                var earth: Earth) {
+
+class Zig(graphicsPipeline: GraphicsPipeline?,
+          graphics: GraphicsLibrary?,
+          var texture: GraphicsTexture?,
+          var earth: Earth) {
 
     var color = Color(1.0f, 1.0f, 1.0f, 0.5f)
 
@@ -49,7 +50,7 @@ class ZebraHoof(graphicsPipeline: GraphicsPipeline?,
         val height = graphics?.heightf ?: 0.0f
 
 
-        modelViewMatrix.translation(width / 4.0f, height * 3.0f / 4.0f, 0.0f)
+        modelViewMatrix.translation(width * 3.0f / 4.0f, height * 3.0f / 4.0f, 0.0f)
         modelViewMatrix.rotateY(spin)
         modelViewMatrix.scale(0.5f)
 
@@ -57,14 +58,15 @@ class ZebraHoof(graphicsPipeline: GraphicsPipeline?,
 
             graphics?.blendSetAlpha()
 
-            graphics?.linkBufferToShaderProgram(graphicsPipeline?.programShape3D, strip.shapeVertexBuffer)
+            graphics?.linkBufferToShaderProgram(graphicsPipeline?.programSprite3D, strip.spriteVertexBuffer)
 
-            graphics?.uniformsModulateColorSet(graphicsPipeline?.programShape3D, color)
-            graphics?.uniformsProjectionMatrixSet(graphicsPipeline?.programShape3D, projectionMatrix)
-            graphics?.uniformsModelViewMatrixSet(graphicsPipeline?.programShape3D, modelViewMatrix)
+            graphics?.uniformsTextureSet(graphicsPipeline?.programSprite2D, texture)
+            graphics?.uniformsModulateColorSet(graphicsPipeline?.programSprite3D, color)
+            graphics?.uniformsProjectionMatrixSet(graphicsPipeline?.programSprite3D, projectionMatrix)
+            graphics?.uniformsModelViewMatrixSet(graphicsPipeline?.programSprite3D, modelViewMatrix)
 
             graphics?.drawTriangleStrips(strip.indexBuffer, strip.indices.size)
-            graphics?.unlinkBufferFromShaderProgram (graphicsPipeline?.programShape3D)
+            graphics?.unlinkBufferFromShaderProgram (graphicsPipeline?.programSprite3D)
 
         }
 

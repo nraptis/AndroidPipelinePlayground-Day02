@@ -30,6 +30,6 @@ class ShaderProgramSprite3D(name: String, vertexShader: Int, fragmentShader: Int
 
         attributeStrideTextureCoordinates = Float.SIZE_BYTES * 5
         attributeSizeTextureCoordinates = 2
-        attributeOffsetTextureCoordinates = Float.SIZE_BYTES * 2
+        attributeOffsetTextureCoordinates = Float.SIZE_BYTES * 3
     }
 }

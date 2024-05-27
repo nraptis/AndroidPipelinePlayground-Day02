@@ -10,6 +10,9 @@ class EarthModelDataStrip(var earthModelData: EarthModelData?,
     val shapeVertexArray: Array<VertexShape3D>
     val shapeVertexBuffer: GraphicsArrayBuffer<VertexShape3D>
 
+    val spriteVertexArray: Array<VertexSprite3D>
+    val spriteVertexBuffer: GraphicsArrayBuffer<VertexSprite3D>
+
     val indices: IntArray
     val indexBuffer: IntBuffer
 
@@ -26,29 +29,12 @@ class EarthModelDataStrip(var earthModelData: EarthModelData?,
             VertexShape3D(0.0f, 0.0f, 0.0f)
         }
 
+        spriteVertexArray = Array(indexCount) {
+            VertexSprite3D(0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+        }
+
         earthModelData?.let { _earthModelData ->
             for (indexH in 0 .. EarthModelData.tileCountH) {
-
-                val x1 = _earthModelData.points[indexH][indexV - 1].x
-                val y1 = _earthModelData.points[indexH][indexV - 1].y
-                val z1 = _earthModelData.points[indexH][indexV - 1].z
-
-                println("indexH = " + indexH + ", x = " + x1)
-
-                val normalX1 = _earthModelData.normals[indexH][indexV - 1].x
-                val normalY1 = _earthModelData.normals[indexH][indexV - 1].y
-                val normalZ1 = _earthModelData.normals[indexH][indexV - 1].z
-
-                val u1 = _earthModelData.textureCoords[indexH][indexV - 1].x
-                val v1 = _earthModelData.textureCoords[indexH][indexV - 1].y
-
-                val x2 = _earthModelData.points[indexH][indexV].x
-                val y2 = _earthModelData.points[indexH][indexV].y
-                val z2 = _earthModelData.points[indexH][indexV].z
-
-                val normalX2 = _earthModelData.normals[indexH][indexV].x
-                val normalY2 = _earthModelData.normals[indexH][indexV].y
-                val normalZ2 = _earthModelData.normals[indexH][indexV].z
 
                 val vertexIndex1 = indexH * 2
                 val vertexIndex2 = vertexIndex1 + 1
@@ -56,17 +42,46 @@ class EarthModelDataStrip(var earthModelData: EarthModelData?,
                 val vertex1 = shapeVertexArray[vertexIndex1]
                 val vertex2 = shapeVertexArray[vertexIndex2]
 
-                vertex1.x = x1
-                vertex1.y = y1
-                vertex1.z = z1
+                vertex1.x = _earthModelData.points[indexH][indexV - 1].x
+                vertex1.y = _earthModelData.points[indexH][indexV - 1].y
+                vertex1.z = _earthModelData.points[indexH][indexV - 1].z
 
-                vertex2.x = x2
-                vertex2.y = y2
-                vertex2.z = z2
+                vertex2.x = _earthModelData.points[indexH][indexV].x
+                vertex2.y = _earthModelData.points[indexH][indexV].y
+                vertex2.z = _earthModelData.points[indexH][indexV].z
+
+
+                //spriteVertexArray
+            }
+
+            for (indexH in 0 .. EarthModelData.tileCountH) {
+
+                val vertexIndex1 = indexH * 2
+                val vertexIndex2 = vertexIndex1 + 1
+
+                val vertex1 = spriteVertexArray[vertexIndex1]
+                val vertex2 = spriteVertexArray[vertexIndex2]
+
+                vertex1.x = _earthModelData.points[indexH][indexV - 1].x
+                vertex1.y = _earthModelData.points[indexH][indexV - 1].y
+                vertex1.z = _earthModelData.points[indexH][indexV - 1].z
+
+                vertex1.u = _earthModelData.textureCoords[indexH][indexV - 1].x
+                vertex1.v = _earthModelData.textureCoords[indexH][indexV - 1].y
+
+                vertex2.x = _earthModelData.points[indexH][indexV].x
+                vertex2.y = _earthModelData.points[indexH][indexV].y
+                vertex2.z = _earthModelData.points[indexH][indexV].z
+
+                vertex2.u = _earthModelData.textureCoords[indexH][indexV].x
+                vertex2.v = _earthModelData.textureCoords[indexH][indexV].y
+
             }
         }
 
         shapeVertexBuffer = GraphicsArrayBuffer(graphics, shapeVertexArray)
+        spriteVertexBuffer = GraphicsArrayBuffer(graphics, spriteVertexArray)
+
 
     }
 }
