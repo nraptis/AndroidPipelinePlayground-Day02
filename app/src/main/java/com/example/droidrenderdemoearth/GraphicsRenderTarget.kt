@@ -3,13 +3,14 @@ package com.example.droidrenderdemoearth
 import android.content.Context
 import android.graphics.Bitmap
 
-class GraphicsTexture {
+class GraphicsRenderTarget {
 
+    /*
     var graphics: GraphicsLibrary?
-    var textureIndex: Int
+    var frameBufferIndex: Int
     var width: Int
     var height: Int
-    var fileName: String?
+    val texture: GraphicsTexture
 
     constructor(context: Context?, graphics: GraphicsLibrary?, fileName: String) : this(graphics,
         FileUtils.readFileFromAssetAsBitmap(context, fileName), fileName) {
@@ -33,16 +34,5 @@ class GraphicsTexture {
         }
     }
 
-    constructor(graphics: GraphicsLibrary?, width: Int, height: Int, fileName: String? = null) {
-        this.graphics = graphics
-        this.fileName = fileName
-        this.width = width
-        this.height = height
-        textureIndex = -1
-
-        graphics?.let { _graphics ->
-            textureIndex = _graphics.textureGenerate(width, height)
-        }
-    }
-
+    */
 }

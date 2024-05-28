@@ -76,11 +76,6 @@ class GraphicsRenderer(var context: Context?,
 
 
 
-
-
-
-
-
         junkText = graphics.textureGenerate(width, height)
 
         vertexBuffer = GraphicsArrayBuffer(graphics, zippoVertz)
@@ -93,20 +88,19 @@ class GraphicsRenderer(var context: Context?,
         frameBufferIndex = frameBufferHandle[0]
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBufferIndex)
-
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, junkText, 0)
 
 
 
-        val renderBufferHandle = IntArray(1)
-        GLES20.glGenFramebuffers(1, frameBufferHandle, 0)
-        renderBufferIndex = renderBufferHandle[0]
+        //val renderBufferHandle = IntArray(1)
+        //GLES20.glGenFramebuffers(1, renderBufferHandle, 0)
+        //renderBufferIndex = renderBufferHandle[0]
 
-        GLES20.glGenRenderbuffers(1, renderBufferHandle, 0)
-        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, renderBufferIndex)
-        GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, width, height)
-        GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_RENDERBUFFER, renderBufferIndex)
 
+        //GLES20.glGenRenderbuffers(1, renderBufferHandle, 0)
+        //GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, renderBufferIndex)
+        //GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, width, height)
+        //GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_RENDERBUFFER, renderBufferIndex)
 
 
         println("frameBufferIndex = " + frameBufferIndex)

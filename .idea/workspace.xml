@@ -11,9 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="c1d6acd0-3e89-4682-ba81-449899b16cdb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/droidrenderdemoearth/GraphicsLibrary.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/droidrenderdemoearth/GraphicsLibrary.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/droidrenderdemoearth/GraphicsRenderer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/droidrenderdemoearth/GraphicsRenderer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/droidrenderdemoearth/ShaderProgramSprite3D.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/droidrenderdemoearth/ShaderProgramSprite3D.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/droidrenderdemoearth/GraphicsTexture.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/droidrenderdemoearth/GraphicsTexture.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
